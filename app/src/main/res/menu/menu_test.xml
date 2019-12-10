@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/main_List"
+        android:icon="@mipmap/ic_launcher"
+        android:title="本地"/>
+    <item
+        android:id="@+id/list_1"
+        android:icon="@mipmap/ic_launcher"
+        android:title="歌单1"/>
+
+    <item
+        android:id="@+id/list_2"
+        android:icon="@mipmap/ic_launcher"
+        android:title="歌单2"/>
+
+</menu>
