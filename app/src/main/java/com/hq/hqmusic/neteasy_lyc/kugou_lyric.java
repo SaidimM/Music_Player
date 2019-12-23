@@ -1,11 +1,12 @@
 package com.hq.hqmusic.neteasy_lyc;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
+
+
+import android.os.Environment;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.hq.hqmusic.UI.Main2Activity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,7 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.List;
+
 public class kugou_lyric {
     public static void searchLyric(final String name, final String duration){
         String lyric;
@@ -53,8 +54,8 @@ public class kugou_lyric {
                     System.out.println(base64);
                     String lyric = Base64.getFromBase64(base64);
                     System.out.println(lyric);
-                    System.out.println("sdcard/Download/lyric/"+name+".lrc");
-                    File file = new File("sdcard/Download/lyric/"+name+".lrc");
+                    String path= Environment.getExternalStoragePublicDirectory("").getPath();
+                    File file = new File(path+"/MyPlayer/"+name+".lrc");
                     if(!file.exists()){
                         try {
                             FileOutputStream fos = new FileOutputStream(file);

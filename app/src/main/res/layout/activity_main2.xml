@@ -49,11 +49,18 @@
                 android:background="#0B2936"
                 android:src="@mipmap/ic_music_tag"
                 android:contentDescription="TODO" />
-            <com.hq.hqmusic.Lyric.WordView
-                android:id="@+id/text"
-                android:visibility="invisible"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="411dp"
+                android:orientation="vertical"
+                android:visibility="invisible"
+                android:id="@+id/lrcContainer">
+                <com.hq.hqmusic.LYRICS.LrcView
+                    android:id="@+id/lrcView"
+                    android:layout_width="match_parent"
+                    android:layout_height="411dp"
+                    />
+            </LinearLayout>
         </RelativeLayout>
 
 

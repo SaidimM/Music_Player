@@ -2,16 +2,22 @@ package com.hq.hqmusic.UI;
 
 import android.Manifest;
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -37,6 +43,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.speech.asr.SpeechConstant;
 import com.hq.hqmusic.Adapter.MyAdapter;
 import com.hq.hqmusic.CustomView.CustomDialog;
 import com.hq.hqmusic.CustomView.MyDialog;
@@ -46,24 +53,32 @@ import com.hq.hqmusic.StatusBar.BaseActivity;
 import com.hq.hqmusic.StatusBar.SystemBarTintManager;
 import com.hq.hqmusic.Utils.ImageCacheUtil;
 import com.hq.hqmusic.Utils.MusicUtils;
+import com.hq.hqmusic.wakeUp.IWakeupListener;
+import com.hq.hqmusic.wakeUp.MyWakeup;
+import com.hq.hqmusic.wakeUp.RecogWakeupListener;
+import com.hq.hqmusic.wakeUp.SimpleWakeupListener;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import kr.co.namee.permissiongen.PermissionFail;
 import kr.co.namee.permissiongen.PermissionGen;
 import kr.co.namee.permissiongen.PermissionSuccess;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity  {
 
-
+    public static MyWakeup myWakeup;
     private SharedPreferences sharedPreferences;
     private ListView listview,listView1,listView2;
     public static List<Song> list,list1,list2,mainList;
-    private MyAdapter adapter,adapter1,adapter2;
+    private static MyAdapter adapter;
+    private MyAdapter adapter1;
+    private MyAdapter adapter2;
     private PopupWindow popupWindow;
     public static MediaPlayer mplayer = new MediaPlayer();
     private MyDialog myDialog, myDialog_bestlove;
@@ -80,8 +95,8 @@ public class MainActivity extends BaseActivity {
     // 用于判断当前的播放顺序，0->单曲循环,1->顺序播放,2->随机播放
     public static int play_style = 0;
     // 判断seekbar是否正在滑动
-    private boolean ischanging = false;
-    private Thread thread;
+    private static boolean ischanging = false;
+    private static Thread thread;
     // 当前音乐播放位置,从0开始
     public static int currentposition;
     // 屏幕显示的最大listview条数
@@ -90,6 +105,8 @@ public class MainActivity extends BaseActivity {
     private String string_theme;
     // 修改顶部状态栏颜色使用
     private SystemBarTintManager mTintManager;
+    protected Handler handler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,6 +168,8 @@ public class MainActivity extends BaseActivity {
         // 设置mediaplayer监听器
         setMediaPlayerListener();
 
+        initPermission();
+
         to_second.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -164,6 +183,9 @@ public class MainActivity extends BaseActivity {
                 showPopupMenu();
             }
         });
+        IWakeupListener listener= new SimpleWakeupListener();
+        myWakeup = new MyWakeup(this, listener);
+        start();
     }
 
     @Override
@@ -524,26 +546,14 @@ public class MainActivity extends BaseActivity {
         textView2 = (TextView) layout_playbar.findViewById(R.id.singer);
         seekBar = (SeekBar) layout_playbar.findViewById(R.id.seekbar);
         Button_play.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-
-                if (mplayer.isPlaying()) {
-                    mplayer.pause();
-                    Button_play.setText("▶");
-                } else {
-                    mplayer.start();
-                    // thread = new Thread(new SeekBarThread());
-                    // thread.start();
-                    Button_play.setText("‖");
-
-                }
+                play();
             }
         });
 
         Button_next.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
@@ -558,7 +568,6 @@ public class MainActivity extends BaseActivity {
         });
 
         Button_front.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
@@ -761,7 +770,7 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private void musicplay(int position) {
+    private static void musicplay(int position) {
 
         textView1.setText(cut_song_name(list.get(position).getSong()).trim());
         textView2.setText(list.get(position).getSinger().trim());
@@ -771,8 +780,6 @@ public class MainActivity extends BaseActivity {
             mplayer.setDataSource(list.get(position).getPath());
             mplayer.prepare();
             mplayer.start();
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -818,7 +825,7 @@ public class MainActivity extends BaseActivity {
     }
 
     // 自定义的线程,用于下方seekbar的刷新
-    class SeekBarThread implements Runnable {
+    static class SeekBarThread implements Runnable {
 
         @Override
         public void run() {
@@ -837,9 +844,20 @@ public class MainActivity extends BaseActivity {
             }
         }
     }
-
+    //播放
+    public static void play(){
+        if (mplayer.isPlaying()) {
+            mplayer.pause();
+            Button_play.setText("▶");
+        } else {
+            mplayer.start();
+            // thread = new Thread(new SeekBarThread());
+            // thread.start();
+            Button_play.setText("‖");
+        }
+    }
     // 下一曲
-    private void nextMusic() {
+    public static void nextMusic() {
         currentposition++;
         if (currentposition > list.size() - 1) {
             currentposition = 0;
@@ -850,7 +868,7 @@ public class MainActivity extends BaseActivity {
     }
 
     // 上一曲
-    private void frontMusic() {
+    public static void frontMusic() {
         currentposition--;
         if (currentposition < 0) {
             currentposition = list.size() - 1;
@@ -870,7 +888,7 @@ public class MainActivity extends BaseActivity {
     }
 
     // 切掉音乐名字最后的.mp3
-    private String cut_song_name(String name) {
+    private static String cut_song_name(String name) {
         if (name.length() >= 5
                 && name.substring(name.length() - 4, name.length()).equals(
                 ".mp3")) {
@@ -940,5 +958,41 @@ public class MainActivity extends BaseActivity {
     }
     public static List<Song> getList(){
         return list;
+    }
+
+
+
+
+    private void initPermission() {
+        String[] permissions = {
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.INTERNET,
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+        ArrayList<String> toApplyList = new ArrayList<String>();
+
+        for (String perm : permissions) {
+            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(this, perm)) {
+                toApplyList.add(perm);
+                // 进入到这里代表没有权限.
+
+            }
+        }
+        String[] tmpList = new String[toApplyList.size()];
+        if (!toApplyList.isEmpty()) {
+            ActivityCompat.requestPermissions(this, toApplyList.toArray(tmpList), 123);
+        }
+    }
+
+    public static void start() {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put(SpeechConstant.WP_WORDS_FILE, "assets:///WakeUp.bin");
+        // "assets:///WakeUp.bin" 表示WakeUp.bin文件定义在assets目录下
+        // params.put(SpeechConstant.ACCEPT_AUDIO_DATA,true);
+        // params.put(SpeechConstant.IN_FILE,"res:///com/baidu/android/voicedemo/wakeup.pcm");
+        // params里 "assets:///WakeUp.bin" 表示WakeUp.bin文件定义在assets目录下
+        myWakeup.start(params);
     }
 }

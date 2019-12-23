@@ -27,7 +27,6 @@ public class MusicUtils {
 				song.setPath(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)));
 				song.setDuration( cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)));
 				song.setSize( cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)));
-
 				if (song.getSize() > 1000 * 800) {//过滤掉短音频
 					// 分离出歌曲名和歌手
 					if (song.getSong().contains("-")) {

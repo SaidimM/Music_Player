@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.hq.hqmusic"
+        applicationId "com.example.MyMusicPlayer"
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
@@ -16,8 +16,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
 }
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
@@ -31,4 +34,5 @@ dependencies {
     implementation files('libs/gson-2.2.4-sources.jar')
     implementation files('libs/gson-2.2.1.jar')
     implementation files('libs/json-lib-2.4-jdk15.jar')
+    implementation files('libs/bdasr_V3_20190515_c9eed5d.jar')
 }

@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission  android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -23,9 +27,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".UI.ThemeSettingActivity"
             android:theme="@style/MyDialogStyle" />
+        <meta-data
+            android:name="com.baidu.speech.APP_ID"
+            android:value="18083036" />
+        <meta-data
+            android:name="com.baidu.speech.API_KEY"
+            android:value="myyVA6VsAbjCk5gx8dQIOPqU" />
+        <meta-data
+            android:name="com.baidu.speech.SECRET_KEY"
+            android:value="fYgYRnQZLW1e6z5XwkaIDmKp6hmi5qRt" />
     </application>
 
 </manifest>
