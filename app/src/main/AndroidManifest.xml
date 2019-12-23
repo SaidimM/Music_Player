@@ -33,13 +33,13 @@
             android:theme="@style/MyDialogStyle" />
         <meta-data
             android:name="com.baidu.speech.APP_ID"
-            android:value="18083036" />
+            android:value="8888888" />
         <meta-data
             android:name="com.baidu.speech.API_KEY"
-            android:value="myyVA6VsAbjCk5gx8dQIOPqU" />
+            android:value="zxcxcvcbvnvbnvbnvnvb" />
         <meta-data
             android:name="com.baidu.speech.SECRET_KEY"
-            android:value="fYgYRnQZLW1e6z5XwkaIDmKp6hmi5qRt" />
+            android:value="hbajfljadncknadklfdsfnsdkvknljkn" />
     </application>
 
 </manifest>
